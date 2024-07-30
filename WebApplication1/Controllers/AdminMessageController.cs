@@ -16,10 +16,9 @@ namespace WebApplication1.Controllers
         //messageQueue Must have JsonElements
         private static readonly List<JsonElement> _messageQueue = new List<JsonElement>();
 
-        //Definition MesaageHubService in Service Folder
+        // Definition of MessageHub Service
         private readonly IHubContext<MessageHub> _hubContext;
 
-        // MessageHub Configuration
         public AdminMessageController(IHubContext<MessageHub> hubContext)
         {
             _hubContext = hubContext;
@@ -27,10 +26,9 @@ namespace WebApplication1.Controllers
 
         [HttpPost]
         public async Task<IActionResult> PostMessage([FromBody] JsonElement jsonElement)
-        {  
-           
+        {
             bool hasMessage = false;
-            // set condition if input has message field
+            // Check if input JSON contains "message" field
             if (jsonElement.TryGetProperty("message", out var message))
             {
                 var messageString = message.GetString();
@@ -40,34 +38,34 @@ namespace WebApplication1.Controllers
                 }
             }
 
-            // اضافه کردن JSON ورودی به صف
+            // Add the input JSON to the queue
             _messageQueue.Add(jsonElement);
 
-            // اطلاع‌رسانی برای پیام‌های دریافت شده یا صف
+            // Notify about the message received
             if (hasMessage)
             {
-                await _hubContext.Clients.All.SendAsync("Message Received and Queued with message field", jsonElement.ToString());
+                await _hubContext.Clients.All.SendAsync("Message Received With Message Field", jsonElement.ToString());
             }
             else
             {
-                await _hubContext.Clients.All.SendAsync("Message Recieved and Queued without message field", jsonElement.ToString());
+                await _hubContext.Clients.All.SendAsync("Message Received Without Message Field", jsonElement.ToString());
             }
 
-            // Check Queue Count
+            // Check if the queue has reached or exceeded 10 items
             if (_messageQueue.Count >= 10)
             {
                 var allMessages = _messageQueue.ToArray();
 
-                // Notification for Queue Status
+                // Notify about queue status
                 await _hubContext.Clients.All.SendAsync("QueueStatusUpdate", "Queue reached 10 items and will clear after 10 seconds");
 
-                // Make sure Messages Recieved to Clients
-                await _hubContext.Clients.All.SendAsync("Send All Messages To Clients", allMessages);
+                // Send all queued messages to clients
+                await _hubContext.Clients.All.SendAsync("Send All Messages To Clients", JsonSerializer.Serialize(allMessages));
 
-                // 10 Second Delay
+                // Delay for 10 seconds before clearing the queue
                 await Task.Delay(10000);
 
-              //Clear Queue
+                // Clear the queue
                 _messageQueue.Clear();
             }
 

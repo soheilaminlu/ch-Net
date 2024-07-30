@@ -1743,3 +1743,4 @@ C:\Users\user\Desktop\challenge-test-master\challenge-test-master\TestProject1-c
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\TestProject1-challenge\obj\Debug\net6.0\TestProject1-challenge.pdb
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\TestProject1-challenge\obj\Debug\net6.0\TestProject1-challenge.genruntimeconfig.cache
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\TestProject1-challenge\obj\Debug\net6.0\ref\TestProject1-challenge.dll
+C:\Users\user\Desktop\challenge-test-master\challenge-test-master\TestProject1-challenge\obj\Debug\net6.0\TestProject1-challenge.sourcelink.json

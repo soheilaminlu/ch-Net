@@ -8,7 +8,9 @@ using WebApplication1.TestHelpers;
 using WebApplication1.Models;
 using static WebApplication1.Utils.ApplyUpdate;
 using Microsoft.AspNetCore.Cors;
+using WebApplication1.ErrorHandling;
 namespace WebApplication1.Controllers
+
 {
     [Route("api/[controller]")]
     [EnableCors("AllowSpecificOrigins")]
@@ -38,9 +40,9 @@ namespace WebApplication1.Controllers
                     Website = u.Website,
                    }).ToListAsync();
 
-                if (users == null)
+                if (users.Count == 0)
                 {
-                    return NotFound(new { Message = "No users found." });
+                    return NotFound(new NotFoundResponse { Message = "No users found." });
                 }
 
                 return Ok(users);
@@ -65,7 +67,7 @@ namespace WebApplication1.Controllers
                 var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                 {
-                    return NotFound(new { message = "User Not Found" });
+                    return NotFound(new NotFoundResponse { Message = "User Not found" });
                 }
                 var userMessages = user.Messages.Select(m => new UserMessageDto
                 {
@@ -100,17 +102,18 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
         {
-            if (!ModelState.IsValid)
+            if(!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new BadRequest { Message = $"Invalid Data : {ModelState}" });
             }
+
 
             var existingUser = await _context.Users
                  .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
 
             if (existingUser != null)
             {
-                return Conflict(new { Message = "A user with this email already exists." });
+                return Conflict(new Conflict { Message = "A user with this email already exists." });
             }
             
             try
@@ -149,16 +152,17 @@ namespace WebApplication1.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-            if (!ModelState.IsValid)
+           if(!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new BadRequest { Message = $"Invalid Data : {ModelState}"});
             }
+
             try
             {
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                 {
-                    return NotFound(new { message = "User Not Found" });
+                    return NotFound(new NotFoundResponse { Message = "User Not found." });
                 }
                 //check email unique 
                 var existingUserWithEmail = await _context.Users
@@ -167,7 +171,7 @@ namespace WebApplication1.Controllers
 
                 if (existingUserWithEmail != null)
                 {
-                    return Conflict(new { message = "A user with this email already exists." });
+                    return Conflict(new Conflict { Message = "A user with this email already exists." });
                 }
                 //definition in utils
                 UserUpdateHelper.ApplyUpdates(user, updateUserDto);
@@ -198,7 +202,7 @@ namespace WebApplication1.Controllers
                 var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync( u => u.Id == id);
                 if (user == null)
                 {
-                    return NotFound(new { message = "User Not Found" });
+                    return NotFound(new NotFoundResponse { Message = "User Not found." });
                 }
 
                 _context.Users.Remove(user);

@@ -420,3 +420,4 @@ C:\Users\user\Desktop\challenge-test-master\challenge-test-master\WebApplication
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\WebApplication1\obj\Debug\net6.0\WebApplication1.pdb
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\WebApplication1\obj\Debug\net6.0\WebApplication1.genruntimeconfig.cache
 C:\Users\user\Desktop\challenge-test-master\challenge-test-master\WebApplication1\obj\Debug\net6.0\ref\WebApplication1.dll
+C:\Users\user\Desktop\challenge-test-master\challenge-test-master\WebApplication1\obj\Debug\net6.0\WebApplication1.sourcelink.json

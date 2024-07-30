@@ -7,6 +7,7 @@ using System.Net;
 using static WebApplication1.Utils.ApplyMessageUpdates;
 using WebApplication1.TestHelpers;
 using Microsoft.AspNetCore.Cors;
+using WebApplication1.ErrorHandling;
 
 namespace WebApplication1.Controllers
 {
@@ -43,8 +44,9 @@ namespace WebApplication1.Controllers
             .ToListAsync();
                 if (messages == null || messages.Count == 0)
                 {
-                    return NotFound(new { message = "No messages found" });
+                    return NotFound(new NotFoundResponse { Message = "No messages found" });
                 }
+
                 var response = new GetAllMessagesResponse
                 {
                     Message = "Messages Retrieved Successfuly",
@@ -71,7 +73,7 @@ namespace WebApplication1.Controllers
                 var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
                 if (message == null)
                 {
-                    return NotFound(new { message = "Message not found" });
+                    return NotFound(new NotFoundResponse { Message = " Message Not found" });
                 }
                 return Ok(new { Message = message, log = "Message found successfully" });
             }
@@ -90,20 +92,22 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
+                var message = await _context.Messages.FindAsync(id);
                 if (message == null)
                 {
-                    return NotFound(new { message = "Message not found" });
+                    return NotFound(new NotFoundResponse { Message = "Message Not found" });
                 }
+
                 _context.Messages.Remove(message);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); // Ensure async save
+
                 var response = new DeleteMessageResponse
                 {
                     Message = "Message Deleted Successfully"
                 };
                 return Ok(response);
-            }
-            catch (Exception ex)
+
+            } catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
@@ -111,14 +115,16 @@ namespace WebApplication1.Controllers
                     Details = ex.Message
                 });
             }
+          
         }
+
         //Create Message With UserID In Request body 
         [HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] CreateMessageDto createMessageDto)
         {
             if (createMessageDto == null)
             {
-                return BadRequest(new { message = "Invalid message data" });
+                return BadRequest(new BadRequest { Message = "Invalid message data" });
             }
 
             var message = new MessageModel
@@ -162,7 +168,7 @@ namespace WebApplication1.Controllers
                 var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
                 if (message == null)
                 {
-                    return NotFound(new { message = "Message Not Found" });
+                    return NotFound(new NotFoundResponse { Message = " Message Not found" });
                 }
                 //definition in utils
                 MessageUpdateHelper.ApplyMessagesUpdate(message, updateMessageDto);
@@ -193,7 +199,7 @@ namespace WebApplication1.Controllers
                 var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                 {
-                    return NotFound(new { message = "User Not Found" });
+                    return NotFound(new NotFoundResponse { Message = " User Not found" });
                 }
                 var response = new GetUserMessagesResponse
                 {

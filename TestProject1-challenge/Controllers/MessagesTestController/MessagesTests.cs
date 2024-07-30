@@ -11,29 +11,43 @@ using WebApplication1.Data;
 using WebApplication1.Dto;
 using WebApplication1.Models;
 using WebApplication1.TestHelpers;
+using WebApplication1.ErrorHandling;
 
 namespace TestProject1_challenge.Controllers.MessagesTestController
 {
-    public class MessagesTests
+    public class MessagesTests : IDisposable
     {
-        //Create Fake Db For Testing
+        private readonly ApplicationDbContext _context;
+        private readonly MessagesController _controller;
+
+        public MessagesTests()
+        {
+            _context = GetDbContext();
+            _controller = GetController(_context);
+        }
+
         private ApplicationDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-               .UseInMemoryDatabase(databaseName: "TestDatabase")
-               .Options;
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
             var context = new ApplicationDbContext(options);
-            context.Database.EnsureDeleted(); // Ensure the database is clean before each test
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             return context;
         }
-        //Import MessageController from project
+
         private MessagesController GetController(ApplicationDbContext context)
         {
             return new MessagesController(context);
         }
 
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
         // Ok Senario for GetAll Messages
         [Fact]
         public async Task GetAllMessages_ReturnsOkResult()
@@ -85,6 +99,19 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             Assert.Equal(3, secondMessage.views);
             Assert.False(secondMessage.published);
         }
+        // Not Found Senario for GetAllMessages
+        [Fact]
+        public async Task GetAllMessages_ReturnsNotFound_WhenNoMessagesExist()
+        {
+            // Act
+            var result = await _controller.GetAllMessages();
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("No messages found", response.Message);
+        }
 
         // OK Senario for Create Message
         [Fact]
@@ -108,7 +135,24 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             Assert.NotNull(response.MessageInfo.DateModified); // Check DateModified is not null
 
         }
-         
+        // BadRequest Senario For Create Message
+
+        [Fact]
+        public async Task CreateMessage_ReturnsBadRequest_WhenMessageDataIsInvalid()
+        {
+            // Arrange
+            var invalidMessageDto = (CreateMessageDto)null; // Test invalid message data
+
+            // Act
+            var result = await _controller.CreateMessage(invalidMessageDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var response = Assert.IsType<BadRequest>(badRequestResult.Value);
+
+            Assert.Equal("Invalid message data", response.Message);
+        }
+
         //OK Senario for Update Message
         [Fact]
         public async Task UpdateMessage_ShouldReturnOkResponse()
@@ -144,33 +188,27 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var timeDifference = DateTime.UtcNow - updatedMessage.DateModified.Value;
             Assert.True(timeDifference.TotalSeconds < 5, "DateModified should be within 5 seconds of the current time.");
         }
-
-        // Ok Senario for Delete Message
-        [Fact]
-        public async Task DeleteMessageById_ShouldReturnOkResult()
+        // Not Found Senario For Update Message
+        public async Task UpdateMessage_ReturnsNotFound_WhenMessageDoesNotExist()
         {
-            var context = GetDbContext();
-            var message = new MessageModel
+            // Arrange
+            var nonExistentMessageId = 999; // A message ID that does not exist
+            var updateMessageDto = new UpdateMessageDto
             {
-                Id = 1,
-                Content = "Test For Delete"
-               
+                Content = "Updated content"
             };
-            
-            context.Messages.Add(message);
-            context.SaveChanges();
-            var controller = GetController(context);
-            var result = await controller.DeleteMessage(1);
 
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = okResult.Value as DeleteUserResponse;
+            // Act
+            var result = await _controller.UpdateMessage(nonExistentMessageId, updateMessageDto);
 
-            Assert.NotNull(response);
-            Assert.Equal("Message Deleted Successfully", response.Message);
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            var deletedMessage = await context.Users.FindAsync(1);
-            Assert.Null(deletedMessage);
+            Assert.Equal(" Message Not found", response.Message);
         }
+
+
         // OK Senario For GetUserMessages
         [Fact]
         public async Task GetUserMessage_ShouldReturnOkResult()
@@ -221,6 +259,69 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             Assert.Contains(response.UserMessages, m => m.Content == "Message 1");
             Assert.Contains(response.UserMessages, m => m.Content == "Message 2");
 
+        }
+
+        // Not Found Senario for GetUserMessages
+        [Fact]
+        public async Task GetUserMessages_ReturnsNotFound_WhenUserDoesNotExist()
+        {
+            // Arrange
+            var nonExistentUserId = 999; // A user ID that does not exist
+
+            // Act
+            var result = await _controller.GetUserMessages(nonExistentUserId);
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal(" User Not found", response.Message);
+        }
+
+        // Ok Senario for Delete Message
+        [Fact]
+        public async Task DeleteMessageById_ShouldReturnOkResult()
+        {
+            var context = GetDbContext();
+            var message = new MessageModel
+            {
+                Id = 1,
+                Content = "Test For Delete",
+                DateCreated = DateTime.UtcNow,
+                DateModified = DateTime.UtcNow,
+                views = 0,
+                published = false,
+                UserId = 1
+            };
+            context.Messages.Add(message);
+            context.SaveChanges();
+            var controller = GetController(context);
+            var result = await controller.DeleteMessage(1);
+
+            var okResult = Assert.IsType<OkObjectResult>(result);
+            var response = Assert.IsType<DeleteMessageResponse>(okResult.Value);
+
+            Assert.NotNull(response);
+            Assert.Equal("Message Deleted Successfully", response.Message);
+
+            var deletedMessage = await context.Messages.FindAsync(1);
+            Assert.Null(deletedMessage);
+        }
+
+        [Fact]
+        public async Task DeleteMessageById_ShouldReturnNotFound_WhenMessageDoesNotExist()
+        {
+            var context = GetDbContext();
+            var controller = GetController(context);
+
+            // Act
+            var result = await controller.DeleteMessage(999); // Id that does not exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("Message Not found", response.Message);
         }
     }
     }

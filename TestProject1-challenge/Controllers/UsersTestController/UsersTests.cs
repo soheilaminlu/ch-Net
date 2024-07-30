@@ -8,54 +8,64 @@ using System.Threading.Tasks;
 using WebApplication1.Controllers;
 using WebApplication1.Data;
 using WebApplication1.Dto;
+using WebApplication1.ErrorHandling;
 using WebApplication1.Models;
 using WebApplication1.TestHelpers;
 
 namespace TestProject1_challenge.Controllers.UsersTestController
 {
 
-    
-    public class UsersTests
+    public class UsersTests : IDisposable
     {
-         // Create Fake Db For Testing
+        private readonly ApplicationDbContext _context;
+        private readonly UsersController _controller;
+
+        public UsersTests()
+        {
+            _context = GetDbContext();
+            _controller = GetController(_context);
+        }
+
         private ApplicationDbContext GetDbContext()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-               .UseInMemoryDatabase(databaseName: "TestDatabase")
-               .Options;
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+
             var context = new ApplicationDbContext(options);
-            context.Database.EnsureDeleted(); // Ensure the database is clean before each test
+            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             return context;
         }
-        // import and user Controller From Project
+
         private UsersController GetController(ApplicationDbContext context)
         {
             return new UsersController(context);
         }
 
-        //OK Senario for GetAll Users
+        public void Dispose()
+        {
+            _context.Dispose();
+        }
+
         [Fact]
         public async Task GetAllUsers_ReturnsOkResult()
         {
             // Arrange
-            var context = GetDbContext();
-            context.Users.AddRange(
+            _context.Users.AddRange(
                 new UserModel { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Age = 30, Website = "www.johndoe.com" },
                 new UserModel { Id = 2, FirstName = "Jane", LastName = "Doe", Email = "jane.doe@example.com", Age = 25, Website = "www.janedoe.com" }
             );
-            context.SaveChanges();
-
-            var controller = GetController(context);
+            await _context.SaveChangesAsync();
 
             // Act
-            var result = await controller.GetAllUsers();
+            var result = await _controller.GetAllUsers();
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
             var users = Assert.IsType<List<UserDto>>(okResult.Value);
-            
+
             Assert.Equal(2, users.Count);
 
             var firstUser = users.First();
@@ -74,13 +84,31 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             Assert.Equal(25, secondUser.Age);
             Assert.Equal("www.janedoe.com", secondUser.Website);
         }
-        // OK Senario for CreateUser 
+
         [Fact]
-        public async Task CreateUser_Returns_reatedActionResult()
+        public async Task GetAllUsers_ReturnsNotFound_WhenNoUsersExist()
         {
+            // Arrange
             var context = GetDbContext();
             var controller = GetController(context);
 
+            // Ensure the database is empty
+            context.Users.RemoveRange(context.Users);
+            await context.SaveChangesAsync();
+
+            // Act
+            var result = await controller.GetAllUsers();
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("No users found.", response.Message);
+        }
+
+        [Fact]
+        public async Task CreateUser_ReturnsCreatedActionResult()
+        {
             var createUserDto = new CreateUserDto
             {
                 FirstName = "Alice",
@@ -90,7 +118,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
                 Website = "www.alicesmith.com"
             };
 
-            var result = await controller.CreateUser(createUserDto);
+            var result = await _controller.CreateUser(createUserDto);
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result);
             var response = Assert.IsType<CreateUserResponse>(createdAtActionResult.Value);
             var user = response.User;
@@ -102,12 +130,75 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             Assert.Equal("alice.smith@example.com", user.Email);
             Assert.Equal(28, user.Age);
             Assert.Equal("www.alicesmith.com", user.Website);
-    }
-        // Ok Senario For GetUser By Id
+        }
+        [Fact]
+        public async Task CreateUser_ReturnsBadRequest_WhenModelStateIsInvalid()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var controller = GetController(context);
+
+            // Create an invalid DTO (e.g., missing required fields)
+            var invalidDto = new CreateUserDto
+            {
+                // Assuming FirstName is required but not provided
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Age = 30,
+                Website = "www.johndoe.com"
+            };
+
+            controller.ModelState.AddModelError("FirstName", "The FirstName field is required.");
+
+            // Act
+            var result = await controller.CreateUser(invalidDto);
+
+            // Assert
+            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+            var response = Assert.IsType<BadRequest>(badRequestResult.Value);
+
+            // The message should contain the ModelState errors
+            Assert.Contains("Invalid Data", response.Message);
+        }
+        [Fact]
+        public async Task CreateUser_ReturnsConflict_WhenEmailAlreadyExists()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var existingUser = new UserModel
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                Email = "john.doe@example.com",
+                Age = 30,
+                Website = "www.johndoe.com"
+            };
+            context.Users.Add(existingUser);
+            await context.SaveChangesAsync();
+
+            var controller = GetController(context);
+            var newUserDto = new CreateUserDto
+            {
+                FirstName = "Jane",
+                LastName = "Doe",
+                Email = "john.doe@example.com", // Email already exists
+                Age = 25,
+                Website = "www.janedoe.com"
+            };
+
+            // Act
+            var result = await controller.CreateUser(newUserDto);
+
+            // Assert
+            var conflictResult = Assert.IsType<ConflictObjectResult>(result);
+            var response = Assert.IsType<Conflict>(conflictResult.Value); // Conflict response type is dynamic
+
+            Assert.Equal("A user with this email already exists.", response.Message);
+        }
         [Fact]
         public async Task GetUserById_ShouldReturnOkResult()
         {
-            var context = GetDbContext();  
             var user = new UserModel
             {
                 Id = 1,
@@ -117,13 +208,13 @@ namespace TestProject1_challenge.Controllers.UsersTestController
                 Age = 28,
                 Website = "www.alicesmith.com"
             };
-            context.Users.Add(user);
-            context.Messages.Add(new MessageModel { Content = "Hello, Alice", UserId = 1 });
-            context.SaveChanges();
-            var controller = GetController(context);
-            var result = await controller.GetUserById(1);
+            _context.Users.Add(user);
+            _context.Messages.Add(new MessageModel { Content = "Hello, Alice", UserId = 1 });
+            await _context.SaveChangesAsync();
+
+            var result = await _controller.GetUserById(1);
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = okResult.Value as GetUserByIdResponse;
+            var response = Assert.IsType<GetUserByIdResponse>(okResult.Value);
 
             Assert.Equal("User Found", response.Message);
             Assert.Equal("Alice", response.Firstname);
@@ -136,26 +227,42 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             Assert.NotNull(messages);
             Assert.Single(messages);
             Assert.Equal("Hello, Alice", messages[0].Content);
-
         }
 
-        // OK Senario for UpdateUser By Id 
+        [Fact]
+        public async Task GetUserById_ReturnsNotFound_WhenUserDoesNotExist()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var controller = GetController(context);
+
+            // Act
+            var result = await controller.GetUserById(999); // Assuming ID 999 does not exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("User Not found", response.Message);
+        }
+
+
+
         [Fact]
         public async Task UpdateUserById_ShouldReturnOkResult()
         {
-            var context = GetDbContext();
             var user = new UserModel
             {
-                Id = 1 , 
+                Id = 1,
                 FirstName = "ali",
                 LastName = "alilast",
                 Age = 28,
                 Email = "ali@ex.com",
                 Website = "www.ali.com"
             };
-            context.Add(user);
-            context.SaveChanges();
-            var controller = GetController(context);
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+
             var updateUserDto = new UpdateUserDto
             {
                 FirstName = "UpdatedAlice",
@@ -164,10 +271,10 @@ namespace TestProject1_challenge.Controllers.UsersTestController
                 Age = 30,
                 Website = "www.updatedalicesmith.com"
             };
-            var result = await controller.UpdateUser(1, updateUserDto);
+            var result = await _controller.UpdateUser(1, updateUserDto);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = okResult.Value as UpdateUserResponse;
+            var response = Assert.IsType<UpdateUserResponse>(okResult.Value);
 
             Assert.NotNull(response);
             Assert.Equal("User successfully updated.", response.Message);
@@ -177,14 +284,68 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             Assert.Equal("updated.alice.smith@example.com", updatedUser.Email);
             Assert.Equal(30, updatedUser.Age);
             Assert.Equal("www.updatedalicesmith.com", updatedUser.Website);
+        }
+        [Fact]
+        public async Task UpdateUser_ReturnsConflict_WhenEmailAlreadyExists()
+        {
+            // Arrange
+            var context = GetDbContext();
+            // Add a user with a specific email
+            context.Users.Add(new UserModel
+            {
+                Id = 1,
+                Email = "existing@example.com"
+            });
+            await context.SaveChangesAsync();
 
+            // Create another user with a different ID
+            var userToUpdate = new UserModel
+            {
+                Id = 2,
+                Email = "new@example.com" // Email to be updated
+            };
+            context.Users.Add(userToUpdate);
+            await context.SaveChangesAsync();
+
+            var controller = GetController(context);
+            var updateUserDto = new UpdateUserDto
+            {
+                Email = "existing@example.com" // Attempt to update with an email that already exists
+            };
+
+            // Act
+            var result = await controller.UpdateUser(2, updateUserDto); // Update user with ID 2
+
+            // Assert
+            var conflictResult = Assert.IsType<ConflictObjectResult>(result);
+            var response = Assert.IsType<Conflict>(conflictResult.Value);
+
+            Assert.Equal("A user with this email already exists.", response.Message);
+        }
+        [Fact]
+        public async Task UpdateUser_ReturnsNotFound_WhenUserDoesNotExist()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var controller = GetController(context);
+            var updateUserDto = new UpdateUserDto
+            {
+                Email = "new@example.com"
+            };
+
+            // Act
+            var result = await controller.UpdateUser(1, updateUserDto); // Assuming user id 1 does not exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("User Not found.", response.Message);
         }
 
-        // OK Senario For DeleteUser By ID
         [Fact]
         public async Task DeleteUserById_ShouldReturnOk()
         {
-            var context = GetDbContext();
             var user = new UserModel
             {
                 Id = 1,
@@ -194,23 +355,38 @@ namespace TestProject1_challenge.Controllers.UsersTestController
                 Age = 28,
                 Website = "www.alicesmith.com"
             };
-            context.Add(user);
-            context.Messages.Add(new MessageModel { Content = "Hello Alice", UserId = 1 });
-            context.SaveChanges();
-            var controller = GetController(context);     
-            var result = await controller.DeleteUser(1);
-           
+            _context.Users.Add(user);
+            _context.Messages.Add(new MessageModel { Content = "Hello Alice", UserId = 1 });
+            await _context.SaveChangesAsync();
+
+            var result = await _controller.DeleteUser(1);
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = okResult.Value as DeleteUserResponse;
+            var response = Assert.IsType<DeleteUserResponse>(okResult.Value);
 
             Assert.NotNull(response);
             Assert.Equal("User and their messages successfully deleted.", response.Message);
 
-            var deletedUser = await context.Users.FindAsync(1);
+            var deletedUser = await _context.Users.FindAsync(1);
             Assert.Null(deletedUser);
 
-            var userMessages = await context.Messages.Where(m => m.UserId == 1).ToListAsync();
+            var userMessages = await _context.Messages.Where(m => m.UserId == 1).ToListAsync();
             Assert.Empty(userMessages);
+        }
+
+        [Fact]
+        public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
+        {
+            var context = GetDbContext();
+            var controller = GetController(context);
+
+            // Act
+            var result = await controller.DeleteUser(999); // Id that does not exist
+
+            // Assert
+            var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
+            var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
+
+            Assert.Equal("User Not found.", response.Message);
         }
     }
 }
