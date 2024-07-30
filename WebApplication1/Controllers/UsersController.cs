@@ -45,7 +45,7 @@ namespace WebApplication1.Controllers
                     return NotFound(new NotFoundResponse { Message = "No users found." });
                 }
 
-                return Ok(users);
+                return Ok(new {message = "Users Retrived Successfuly" , allUser = users});
             }
             catch (Exception ex)
             {
