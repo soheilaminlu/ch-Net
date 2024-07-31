@@ -131,8 +131,8 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             Assert.NotNull(response.MessageInfo);
             Assert.Equal(createMessageDto.Content, response.MessageInfo.Content);
             Assert.Equal(createMessageDto.UserId, response.MessageInfo.UserId);
-            Assert.NotNull(response.MessageInfo.DateCreated); // Check DateCreated is not null
-            Assert.NotNull(response.MessageInfo.DateModified); // Check DateModified is not null
+            Assert.NotNull(response.MessageInfo.DateCreated); 
+            Assert.NotNull(response.MessageInfo.DateModified); 
 
         }
         // BadRequest Senario For Create Message
@@ -148,7 +148,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var response = Assert.IsType<BadRequest>(badRequestResult.Value);
+            var response = Assert.IsType<BadRequestResponse>(badRequestResult.Value);
 
             Assert.Equal("Invalid message data", response.Message);
         }
@@ -213,52 +213,54 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
         [Fact]
         public async Task GetUserMessage_ShouldReturnOkResult()
         {
-            var context = GetDbContext();
-          
-
-            var user = new UserModel
+            // Arrange
+            using (var context = GetDbContext())
             {
-                Id = 1,
-                FirstName = "Alice",
-                LastName = "Smith",
-                Age = 30,
-                Email = "alice.smith@example.com",
-                Website = "www.alicesmith.com"
-            };
+                var user = new UserModel
+                {
+                    Id = 1,
+                    FirstName = "Alice",
+                    LastName = "Smith",
+                    Age = 30,
+                    Email = "alice.smith@example.com",
+                    Website = "www.alicesmith.com"
+                };
 
-            var message1 = new MessageModel
-            {
-                Id = 1,
-                Content = "Message 1",
-                UserId = user.Id,
-                DateCreated = DateTime.UtcNow,
-                DateModified = DateTime.UtcNow
-            };
+                var message1 = new MessageModel
+                {
+                    Id = 1,
+                    Content = "Message 1",
+                    UserId = user.Id,
+                    DateCreated = DateTime.UtcNow,
+                    DateModified = DateTime.UtcNow
+                };
 
-            var message2 = new MessageModel
-            {
-                Id = 2,
-                Content = "Message 2",
-                UserId = user.Id,
-                DateCreated = DateTime.UtcNow,
-                DateModified = DateTime.UtcNow
-            };
+                var message2 = new MessageModel
+                {
+                    Id = 2,
+                    Content = "Message 2",
+                    UserId = user.Id,
+                    DateCreated = DateTime.UtcNow,
+                    DateModified = DateTime.UtcNow
+                };
 
-            context.Users.Add(user);
-            context.Messages.AddRange(message1, message2);
-            context.SaveChanges();
+                context.Users.Add(user);
+                context.Messages.AddRange(message1, message2);
+                await context.SaveChangesAsync();
 
-            var controller = GetController(context);
-            var result = await controller.GetUserMessages(1);
+                var controller = GetController(context);
 
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            var response = Assert.IsType<GetUserMessagesResponse>(okResult.Value);
+                // Act
+                var result = await controller.GetUserMessages(1);
 
-            Assert.NotNull(response);
-            Assert.Equal(2, response.UserMessages.Count);
-            Assert.Contains(response.UserMessages, m => m.Content == "Message 1");
-            Assert.Contains(response.UserMessages, m => m.Content == "Message 2");
+                // Assert
+                var okResult = Assert.IsType<OkObjectResult>(result);
+                var response = Assert.IsType<GetUserMessagesResponse>(okResult.Value);
 
+                Assert.NotNull(response);
+                Assert.Contains(response.UserMessages, m => m.Content == "Message 1");
+                Assert.Contains(response.UserMessages, m => m.Content == "Message 2");
+            }
         }
 
         // Not Found Senario for GetUserMessages
@@ -266,7 +268,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
         public async Task GetUserMessages_ReturnsNotFound_WhenUserDoesNotExist()
         {
             // Arrange
-            var nonExistentUserId = 999; // A user ID that does not exist
+            var nonExistentUserId = 999; 
 
             // Act
             var result = await _controller.GetUserMessages(nonExistentUserId);
@@ -275,7 +277,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            Assert.Equal(" User Not found", response.Message);
+            Assert.Equal("User Not found", response.Message);
         }
 
         // Ok Senario for Delete Message

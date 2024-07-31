@@ -8,8 +8,10 @@ using WebApplication1.TestHelpers;
 using WebApplication1.Models;
 using static WebApplication1.Utils.ApplyUpdate;
 using Microsoft.AspNetCore.Cors;
+using WebApplication1.Mapper;
 using WebApplication1.ErrorHandling;
 namespace WebApplication1.Controllers
+
 
 {
     [Route("api/[controller]")]
@@ -30,22 +32,19 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var users = await _context.Users.Select(u => new UserDto
-                {
-                    Id = u.Id,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Email = u.Email,
-                    Age = u.Age,
-                    Website = u.Website,
-                   }).ToListAsync();
+                var users = await _context.Users.ToListAsync();
+                var userDtos = users.ToUserDtos().ToList(); // Define in Mapper Folder 
 
-                if (users.Count == 0)
+                if (!userDtos.Any())
                 {
                     return NotFound(new NotFoundResponse { Message = "No users found." });
                 }
 
-                return Ok(new {message = "Users Retrived Successfuly" , allUser = users});
+                return Ok(new GetAllUsersResponse
+                {
+                    Message = "Users Retrieved Successfully",
+                    Users = userDtos.ToList()
+                });
             }
             catch (Exception ex)
             {
@@ -104,7 +103,7 @@ namespace WebApplication1.Controllers
         {
             if(!ModelState.IsValid)
             {
-                return BadRequest(new BadRequest { Message = $"Invalid Data : {ModelState}" });
+                return BadRequest(new BadRequestResponse { Message = $"Invalid Data : {ModelState}" });
             }
 
 
@@ -113,7 +112,7 @@ namespace WebApplication1.Controllers
 
             if (existingUser != null)
             {
-                return Conflict(new Conflict { Message = "A user with this email already exists." });
+                return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
             }
             
             try
@@ -129,10 +128,12 @@ namespace WebApplication1.Controllers
                 _context.Users.Add(newUser);
                 await _context.SaveChangesAsync();
 
+                var newuserDto = newUser.ToUserDto();
+
                 var response = new CreateUserResponse
                 {
                     Message = "User successfully created.",
-                    User = newUser
+                    User = newuserDto
                 };
 
                 return CreatedAtAction(nameof(GetAllUsers), new { id = newUser.Id }, response);
@@ -154,7 +155,7 @@ namespace WebApplication1.Controllers
         {
            if(!ModelState.IsValid)
             {
-                return BadRequest(new BadRequest { Message = $"Invalid Data : {ModelState}"});
+                return BadRequest(new BadRequestResponse { Message = $"Invalid Data : {ModelState}"});
             }
 
             try
@@ -171,15 +172,17 @@ namespace WebApplication1.Controllers
 
                 if (existingUserWithEmail != null)
                 {
-                    return Conflict(new Conflict { Message = "A user with this email already exists." });
+                    return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
                 }
                 //definition in utils
                 UserUpdateHelper.ApplyUpdates(user, updateUserDto);
                 await _context.SaveChangesAsync();
+
+                var userDto = user.ToUserDto();
                var response = (new UpdateUserResponse
                 {
                     Message = "User successfully updated.",
-                    User = user
+                    User = userDto
                 });
               return Ok(response);
             }

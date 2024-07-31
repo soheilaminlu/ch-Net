@@ -1,10 +1,11 @@
 ﻿using WebApplication1.Models;
+using WebApplication1.Dto;
 
 namespace WebApplication1.TestHelpers
 {
-    public class UpdateMessageResponse
+    public class CreateMessageResponse
     {
         public string? Message { get; set; }
-        public MessageModel? UpdatedMessage { get; set; }
+        public MessagesDto? MessageInfo { get; set; }
     }
 }

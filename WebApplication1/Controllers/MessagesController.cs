@@ -8,6 +8,7 @@ using static WebApplication1.Utils.ApplyMessageUpdates;
 using WebApplication1.TestHelpers;
 using Microsoft.AspNetCore.Cors;
 using WebApplication1.ErrorHandling;
+using WebApplication1.Mapper;
 
 namespace WebApplication1.Controllers
 {
@@ -24,34 +25,26 @@ namespace WebApplication1.Controllers
             _context = context;
         }
 
-        // GetAllMessages 
         [HttpGet]
         public async Task<IActionResult> GetAllMessages()
         {
             try
             {
-                var messages = await _context.Messages
-           .Select(m => new MessagesDto
-           {
-               Id = m.Id,
-               Content = m.Content,
-               DateCreated = m.DateCreated,
-               DateModified = m.DateModified,
-               views = m.views,
-               published = m.published,
-               UserId = m.UserId
-           })
-            .ToListAsync();
-                if (messages == null || messages.Count == 0)
+                var messages = await _context.Messages.ToListAsync();
+
+                if (messages == null || !messages.Any())
                 {
                     return NotFound(new NotFoundResponse { Message = "No messages found" });
                 }
 
+                var messagesDto = messages.ToMessagesDtos(); 
+
                 var response = new GetAllMessagesResponse
                 {
                     Message = "Messages Retrieved Successfuly",
-                    MessagesInfo = messages
+                    MessagesInfo = messagesDto.ToList()
                 };
+
                 return Ok(response);
             }
             catch (Exception ex)
@@ -63,7 +56,6 @@ namespace WebApplication1.Controllers
                 });
             }
         }
-
         //GetMessageById 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetMessageById(int id)
@@ -71,11 +63,21 @@ namespace WebApplication1.Controllers
             try
             {
                 var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
+
                 if (message == null)
                 {
-                    return NotFound(new NotFoundResponse { Message = " Message Not found" });
+                    return NotFound(new NotFoundResponse { Message = "Message Not found" });
                 }
-                return Ok(new { Message = message, log = "Message found successfully" });
+
+                
+                var messageDto = message.ToMessagesDto();
+
+                return Ok(new
+                {
+                    message = "Message Retrived successfully",
+                    MessageData = messageDto,
+                   
+                });
             }
             catch (Exception ex)
             {
@@ -124,7 +126,7 @@ namespace WebApplication1.Controllers
         {
             if (createMessageDto == null)
             {
-                return BadRequest(new BadRequest { Message = "Invalid message data" });
+                return BadRequest(new BadRequestResponse { Message = "Invalid message data" });
             }
 
             var message = new MessageModel
@@ -140,10 +142,12 @@ namespace WebApplication1.Controllers
                 _context.Messages.Add(message);
                 await _context.SaveChangesAsync();
 
+                var messageDto = message.ToMessagesDto();
+
                 var response = new CreateMessageResponse
                 {
                     Message = "Message successfully created.",
-                    MessageInfo = message
+                    MessageInfo = messageDto
                     
                 };
 
@@ -174,10 +178,12 @@ namespace WebApplication1.Controllers
                 MessageUpdateHelper.ApplyMessagesUpdate(message, updateMessageDto);
                 message.DateModified = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
+               var messageDto =  message.ToMessagesDto();
+
                 var response = new UpdateMessageResponse
                 {
                     Message = "Message Updated Successfuly",
-                    UpdatedMessage = message
+                    UpdatedMessage = messageDto
                 };
                return Ok(response);
             }
@@ -191,29 +197,34 @@ namespace WebApplication1.Controllers
             }
         }
         // Get UserMessages With UserId
+       
         [HttpGet("usermessages/{id}")]
         public async Task<IActionResult> GetUserMessages(int id)
         {
             try
             {
+                // شامل کردن پیام‌های کاربر در بازیابی داده
                 var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
+
                 if (user == null)
                 {
-                    return NotFound(new NotFoundResponse { Message = " User Not found" });
+                    return NotFound(new NotFoundResponse { Message = "User Not found" });
                 }
+
+                // استفاده از MessageMapper برای تبدیل لیست پیام‌ها به DTO
+                var userMessagesDto = user.Messages.ToMessagesDtos().ToList();
+
+                if (userMessagesDto.Count == 0)
+                {
+                    return NotFound(new NotFoundResponse { Message = "Not Found Any Messages For this User" });
+                }
+
                 var response = new GetUserMessagesResponse
                 {
-                    UserMessages = user.Messages.Select(m => new MessagesDto
-                    {
-                        Id = m.Id,
-                        Content = m.Content,
-                        DateCreated = m.DateCreated,
-                        DateModified = m.DateModified,
-                        views = m.views,
-                        published = m.published,
-                        UserId = m.UserId
-                    }).ToList()
+                    Message = $"Retrived Messages from User {id}",
+                    UserMessages = userMessagesDto
                 };
+
                 return Ok(response);
             }
             catch (Exception ex)
@@ -224,7 +235,6 @@ namespace WebApplication1.Controllers
                     Details = ex.Message
                 });
             }
-
         }
     }
 }

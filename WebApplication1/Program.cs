@@ -50,7 +50,7 @@ app.UseCors("AllowSpecificOrigins");
 
 app.MapControllers();
 
-// Socket address for connection with client
+// Socket address for signalR connection with client
 
 app.MapHub<MessageHub>("/messageHub");
 

@@ -20,6 +20,7 @@ namespace WebApplication1.Dto
         [Required]
         public int? Age { get; set; }
 
+        [Url(ErrorMessage = "its Not Valid Url")]
         public string? Website { get; set; }
 
     }

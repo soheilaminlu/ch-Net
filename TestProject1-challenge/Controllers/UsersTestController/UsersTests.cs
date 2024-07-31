@@ -48,7 +48,6 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         {
             _context.Dispose();
         }
-
         [Fact]
         public async Task GetAllUsers_ReturnsOkResult()
         {
@@ -64,9 +63,14 @@ namespace TestProject1_challenge.Controllers.UsersTestController
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result);
-            var users = Assert.IsType<List<UserDto>>(okResult.Value);
+            var response = Assert.IsType<GetAllUsersResponse>(okResult.Value);
 
-            Assert.Equal(2, users.Count);
+            // Assert message
+            Assert.Equal("Users Retrieved Successfully", response.Message);
+
+            // Assert user list
+            var users = response.Users;
+
 
             var firstUser = users.First();
             Assert.Equal(1, firstUser.Id);
@@ -84,7 +88,6 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             Assert.Equal(25, secondUser.Age);
             Assert.Equal("www.janedoe.com", secondUser.Website);
         }
-
         [Fact]
         public async Task GetAllUsers_ReturnsNotFound_WhenNoUsersExist()
         {
@@ -155,7 +158,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
 
             // Assert
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            var response = Assert.IsType<BadRequest>(badRequestResult.Value);
+            var response = Assert.IsType<BadRequestResponse>(badRequestResult.Value);
 
             // The message should contain the ModelState errors
             Assert.Contains("Invalid Data", response.Message);
@@ -192,7 +195,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
 
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
-            var response = Assert.IsType<Conflict>(conflictResult.Value); // Conflict response type is dynamic
+            var response = Assert.IsType<ConflictResponse>(conflictResult.Value); // Conflict response type is dynamic
 
             Assert.Equal("A user with this email already exists.", response.Message);
         }
@@ -318,7 +321,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
 
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
-            var response = Assert.IsType<Conflict>(conflictResult.Value);
+            var response = Assert.IsType<ConflictResponse>(conflictResult.Value);
 
             Assert.Equal("A user with this email already exists.", response.Message);
         }

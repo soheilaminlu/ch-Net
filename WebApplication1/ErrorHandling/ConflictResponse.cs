@@ -1,6 +1,6 @@
 ﻿namespace WebApplication1.ErrorHandling
 {
-    public class BadRequest
+    public class ConflictResponse
     {
         public string? Message { get; set; }
     }
