@@ -243,7 +243,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<GetUserByIdResponse>(okResult.Value);
 
-            Assert.Equal("User Found", response.Message);
+            Assert.Equal($"Successfully retrieved user with Id {user.Id}.", response.Message);
             Assert.Equal("Alice", response.Firstname);
             Assert.Equal("Smith", response.Lastname);
             Assert.Equal(28, response.Age);
@@ -262,11 +262,12 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             // Arrange
             var context = GetDbContext();
             var userRepository = GetUserRepository(context);
+            var id = 999;
             var logger = GetLogger<UsersController>();
             var controller = GetController(context, userRepository, logger);
 
             // Act
-            var result = await controller.GetUserById(999); // Assuming ID 999 does not exist
+            var result = await controller.GetUserById(id); // Assuming ID 999 does not exist
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -306,7 +307,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             var response = Assert.IsType<UpdateUserResponse>(okResult.Value);
 
             Assert.NotNull(response);
-            Assert.Equal("User successfully updated.", response.Message);
+            Assert.Equal("User updated successfully.", response.Message);
             var updatedUser = response.User;
             Assert.Equal("UpdatedAlice", updatedUser.FirstName);
             Assert.Equal("UpdatedSmith", updatedUser.LastName);
@@ -367,13 +368,13 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             };
 
             // Act
-            var result = await controller.UpdateUserById(1, updateUserDto); // Assuming user id 1 does not exist
+            var result = await controller.UpdateUserById(999, updateUserDto); // Assuming user id 1 does not exist
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            Assert.Equal("User Not found.", response.Message);
+            Assert.Equal("User not found.", response.Message);
         }
 
         [Fact]
@@ -410,18 +411,20 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
             var context = GetDbContext();
+            var id = 999;
             var userRepository = GetUserRepository(context);
             var logger = GetLogger<UsersController>();
             var controller = GetController(context, userRepository, logger);
 
             // Act
-            var result = await controller.DeleteUserById(999); // Id that does not exist
+           
+            var result = await controller.DeleteUserById(id); // Id that does not exist
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            Assert.Equal("User Not found.", response.Message);
+            Assert.Equal($"User with Id {id} not found.", response.Message);
         }
     }
 }

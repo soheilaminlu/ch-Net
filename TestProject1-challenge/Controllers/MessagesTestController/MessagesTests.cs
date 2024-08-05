@@ -106,7 +106,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<GetAllMessagesResponse>(okResult.Value);
 
-            Assert.Equal("Messages Retrieved Successfuly", response.Message);
+            Assert.Equal("Messages Retrieved Successfully", response.Message);
             Assert.NotNull(response.MessagesInfo);
             Assert.Equal(2, response.MessagesInfo.Count);
 
@@ -131,7 +131,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            Assert.Equal("No messages found", response.Message);
+            Assert.Equal("No messages found.", response.Message);
         }
 
         // OK Senario for Create Message
@@ -207,7 +207,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var response = Assert.IsType<UpdateMessageResponse>(okResult.Value);
 
             Assert.NotNull(response);
-            Assert.Equal("Message Updated Successfuly", response.Message);
+            Assert.Equal("Message updated successfully.", response.Message);
             var updatedMessage = response.UpdatedMessage;
             Assert.Equal("update Content", updatedMessage.Content);
 
@@ -307,7 +307,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
             var response = Assert.IsType<NotFoundResponse>(notFoundResult.Value);
 
-            Assert.Equal("User Not found", response.Message);
+            Assert.Equal("No messages found for user", response.Message);
         }
 
         // Ok Senario for Delete Message

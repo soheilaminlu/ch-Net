@@ -181,10 +181,10 @@ namespace WebApplication1.Controllers
                     return NotFound(new NotFoundResponse { Message = $"Message with Id {id} not found." });
                 }
 
-                return Ok(new
+                return Ok(new UpdateMessageResponse
                 {
                     Message = "Message updated successfully.",
-                    MessageInfo = updatedMessageDto
+                    UpdatedMessage = updatedMessageDto
                 });
             }
             catch (Exception ex)
@@ -208,7 +208,7 @@ namespace WebApplication1.Controllers
 
                 if (userMessagesDto == null || !userMessagesDto.Any())
                 {
-                    return NotFound(new NotFoundResponse { Message = $"No messages found for user with Id {userId}." });
+                    return NotFound(new NotFoundResponse { Message = "No messages found for user" });
                 }
 
                 var response = new GetUserMessagesResponse

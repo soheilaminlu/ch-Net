@@ -80,7 +80,6 @@ namespace WebApplication1.Repository
                 user.Email = userDto.Email;
                 user.Age = userDto.Age;
                 user.Website = userDto.Website;
-            await _context.SaveChangesAsync();
             var userDtoResult = user.ToUserDto();
             return userDtoResult;
         }

@@ -89,7 +89,7 @@ namespace WebApplication1.Controllers
 
                 var response = new GetUserByIdResponse
                 {
-                    Message = "User Retrieved Successfuly",
+                    Message = $"Successfully retrieved user with Id {id}.",
                     Firstname = user.FirstName,
                     Lastname = user.LastName,
                     Age = user.Age,
@@ -165,15 +165,25 @@ namespace WebApplication1.Controllers
 
             try
             {
+
                 var updatedUser = await _userRepo.UpdateUserByIdAsync(id, updateUserDto);
 
                 if (updatedUser == null)
                 {
                     _logger.LogInformation("Not Found User With this Id {UserId}", id);
-                    return NotFound(new NotFoundResponse { Message = $"User with Id {id} not found." });
+                    return NotFound(new NotFoundResponse { Message = "User not found." });
                 }
+
+
+                if (await _userRepo.GetUserByEmailAsync(updatedUser.Email))
+                {
+                    _logger.LogWarning("Attempt to create a user with an existing email: {UserEmail}.", updatedUser.Email);
+                    return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
+                }
+
+                await _context.SaveChangesAsync();
                 _logger.LogInformation("Successfuly Updated User With Id {UserId}", id);
-                return Ok(new
+                return Ok(new UpdateUserResponse
                 {
                     Message = "User updated successfully.",
                     User = updatedUser
@@ -206,7 +216,7 @@ namespace WebApplication1.Controllers
                 _logger.LogInformation("Successfuly Deleted User With Id {UserId}", id);
                 return Ok(new DeleteUserResponse
                 {
-                    Message = "User deleted successfully.",
+                    Message = "User and their messages successfully deleted.",
                     User = deletedUser
                 });
             }

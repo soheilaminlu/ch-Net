@@ -28,7 +28,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
 builder.Services.AddScoped<IAnalyzerRepository, AnalyzerRepository>();
-
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
 
 builder.Services.AddLogging();
 
