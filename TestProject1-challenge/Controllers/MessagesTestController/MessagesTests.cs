@@ -12,6 +12,9 @@ using WebApplication1.Dto;
 using WebApplication1.Models;
 using WebApplication1.TestHelpers;
 using WebApplication1.ErrorHandling;
+using Microsoft.Extensions.Logging;
+using WebApplication1.Interfaces;
+using WebApplication1.Repository;
 
 namespace TestProject1_challenge.Controllers.MessagesTestController
 {
@@ -19,11 +22,15 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
     {
         private readonly ApplicationDbContext _context;
         private readonly MessagesController _controller;
+        private readonly IMessageRepository _messageRepository;
+        private readonly ILogger<MessagesController> _logger;
 
         public MessagesTests()
         {
             _context = GetDbContext();
-            _controller = GetController(_context);
+            _messageRepository = GetMessageRepository(_context);
+            _logger = GetLogger<MessagesController>();
+            _controller = GetController(_context, _messageRepository, _logger);
         }
 
         private ApplicationDbContext GetDbContext()
@@ -39,9 +46,20 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             return context;
         }
 
-        private MessagesController GetController(ApplicationDbContext context)
+        private IMessageRepository GetMessageRepository(ApplicationDbContext context)
         {
-            return new MessagesController(context);
+            var logger = GetLogger<MessageRepository>();
+            return new MessageRepository(context, logger);
+        }
+
+        private MessagesController GetController(ApplicationDbContext context, IMessageRepository messageRepo, ILogger<MessagesController> logger)
+        {
+            return new MessagesController(context, logger, messageRepo);
+        }
+
+        private ILogger<T> GetLogger<T>()
+        {
+            return new LoggerFactory().CreateLogger<T>();
         }
 
         public void Dispose()
@@ -76,7 +94,10 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
      }
  );
             context.SaveChanges();
-            var controller = GetController(context);
+            var messageRepository = GetMessageRepository(context);
+            var logger = GetLogger<MessagesController>();
+
+            var controller = GetController(context, messageRepository, logger);
 
             // Act
             var result = await controller.GetAllMessages();
@@ -118,7 +139,10 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
         public async Task CreateMessage_ShouldReturnCreatedAtAction()
         {
             var context = GetDbContext();
-            var controller = GetController(context);
+            var messageRepository = GetMessageRepository(context);
+            var logger = GetLogger<MessagesController>();
+
+            var controller = GetController(context, messageRepository, logger);
             var createMessageDto = new CreateMessageDto
             {
                Content = "Hello From Alice",
@@ -158,7 +182,10 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
         public async Task UpdateMessage_ShouldReturnOkResponse()
         {
             var context = GetDbContext();
-            var controller = GetController(context);
+            var messageRepository = GetMessageRepository(context);
+            var logger = GetLogger<MessagesController>();
+
+            var controller = GetController(context, messageRepository, logger);
             var message = new MessageModel
             {
                 Id = 1,
@@ -248,10 +275,13 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
                 context.Messages.AddRange(message1, message2);
                 await context.SaveChangesAsync();
 
-                var controller = GetController(context);
+                var messageRepository = GetMessageRepository(context);
+                var logger = GetLogger<MessagesController>();
+
+                var controller = GetController(context, messageRepository, logger);
 
                 // Act
-                var result = await controller.GetUserMessages(1);
+                var result = await controller.GetUserMessagesById(1);
 
                 // Assert
                 var okResult = Assert.IsType<OkObjectResult>(result);
@@ -271,7 +301,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var nonExistentUserId = 999; 
 
             // Act
-            var result = await _controller.GetUserMessages(nonExistentUserId);
+            var result = await _controller.GetUserMessagesById(nonExistentUserId);
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -297,7 +327,10 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             };
             context.Messages.Add(message);
             context.SaveChanges();
-            var controller = GetController(context);
+            var messageRepository = GetMessageRepository(context);
+            var logger = GetLogger<MessagesController>();
+
+            var controller = GetController(context, messageRepository, logger);
             var result = await controller.DeleteMessage(1);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
@@ -314,7 +347,10 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
         public async Task DeleteMessageById_ShouldReturnNotFound_WhenMessageDoesNotExist()
         {
             var context = GetDbContext();
-            var controller = GetController(context);
+            var messageRepository = GetMessageRepository(context);
+            var logger = GetLogger<MessagesController>();
+
+            var controller = GetController(context, messageRepository, logger);
 
             // Act
             var result = await controller.DeleteMessage(999); // Id that does not exist

@@ -10,6 +10,9 @@ using static WebApplication1.Utils.ApplyUpdate;
 using Microsoft.AspNetCore.Cors;
 using WebApplication1.Mapper;
 using WebApplication1.ErrorHandling;
+using WebApplication1.Interfaces;
+using Microsoft.Extensions.Logging;
+using WebApplication1.Repository;
 namespace WebApplication1.Controllers
 
 
@@ -19,12 +22,18 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
+        //Repository Configuration For Dependency Injection
+        IUserRepository _userRepo;
 
+        //Ilogger Configuration
+        private readonly ILogger<UsersController> _logger;
         // Db Configuration
         private readonly ApplicationDbContext _context;
-        public UsersController(ApplicationDbContext context)
+        public UsersController(ApplicationDbContext context, ILogger<UsersController> logger , IUserRepository userRepo)
         {
             _context = context;
+            _logger = logger;
+            _userRepo = userRepo;        
         }
         // All Users without UserMessages
         [HttpGet]
@@ -32,22 +41,23 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var users = await _context.Users.ToListAsync();
-                var userDtos = users.ToUserDtos().ToList(); // Define in Mapper Folder 
+                var users = await _userRepo.GetAllUsersAsync();
 
-                if (!userDtos.Any())
+                if (users == null || users.Count == 0)
                 {
+                    _logger.LogWarning("No users found.");
                     return NotFound(new NotFoundResponse { Message = "No users found." });
                 }
-
+                _logger.LogInformation("Successfully retrieved {Count} users", users.Count);
                 return Ok(new GetAllUsersResponse
                 {
                     Message = "Users Retrieved Successfully",
-                    Users = userDtos.ToList()
+                    Users = users
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while getting all users.");
                 return StatusCode((int)HttpStatusCode.InternalServerError,
                     new
                     {
@@ -63,20 +73,23 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
+                var user = await _userRepo.GetUserByIdAsync(id);
+
                 if (user == null)
                 {
+                    _logger.LogInformation("User with Id {UserId} not found.", id);
                     return NotFound(new NotFoundResponse { Message = "User Not found" });
                 }
+
+               
                 var userMessages = user.Messages.Select(m => new UserMessageDto
                 {
                     Content = m.Content
-
                 }).ToList();
 
                 var response = new GetUserByIdResponse
                 {
-                    Message = "User Found",
+                    Message = "User Retrieved Successfuly",
                     Firstname = user.FirstName,
                     Lastname = user.LastName,
                     Age = user.Age,
@@ -84,11 +97,12 @@ namespace WebApplication1.Controllers
                     Website = user.Website,
                     UserMessages = userMessages
                 };
+                _logger.LogInformation("Successfully retrieved user with Id {UserId}.", id);
                 return Ok(response);
-
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving user with Id {UserId}.", id);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -101,46 +115,34 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateUserDto createUserDto)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
+                _logger.LogInformation("Data Validation Error for Creating User");
                 return BadRequest(new BadRequestResponse { Message = $"Invalid Data : {ModelState}" });
             }
 
-
-            var existingUser = await _context.Users
-                 .FirstOrDefaultAsync(u => u.Email == createUserDto.Email);
-
-            if (existingUser != null)
-            {
-                return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
-            }
-            
             try
             {
-                var newUser = new UserModel
+                // Check if user already exists
+                if (await _userRepo.GetUserByEmailAsync(createUserDto.Email))
                 {
-                    FirstName = createUserDto.FirstName,
-                    LastName = createUserDto.LastName,
-                    Email = createUserDto.Email,
-                    Age = createUserDto.Age,
-                    Website = createUserDto.Website
-                };
-                _context.Users.Add(newUser);
-                await _context.SaveChangesAsync();
+                    _logger.LogWarning("Attempt to create a user with an existing email: {UserEmail}.", createUserDto.Email);
+                    return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
+                }
 
-                var newuserDto = newUser.ToUserDto();
+                // Create a new user
+                var newUserDto = await _userRepo.CreateUserAsync(createUserDto);
 
-                var response = new CreateUserResponse
+                _logger.LogInformation("User with email {UserEmail} successfully created.", createUserDto.Email);
+                return CreatedAtAction(nameof(GetAllUsers), new CreateUserResponse
                 {
                     Message = "User successfully created.",
-                    User = newuserDto
-                };
-
-                return CreatedAtAction(nameof(GetAllUsers), new { id = newUser.Id }, response);
-
+                    User = newUserDto
+                });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while creating user with email {UserEmail}.", createUserDto.Email);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -149,45 +151,37 @@ namespace WebApplication1.Controllers
             }
         }
 
+
         // Patch request for update users 
         [HttpPatch("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] UpdateUserDto updateUserDto)
+        public async Task<IActionResult> UpdateUserById(int id, [FromBody] UpdateUserDto updateUserDto)
         {
-           if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new BadRequestResponse { Message = $"Invalid Data : {ModelState}"});
+
+                _logger.LogInformation("Data Validation Error for Creating User");
+                return BadRequest(new BadRequestResponse { Message = $"Invalid Data: {ModelState}" });
             }
 
             try
             {
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
-                if (user == null)
-                {
-                    return NotFound(new NotFoundResponse { Message = "User Not found." });
-                }
-                //check email unique 
-                var existingUserWithEmail = await _context.Users
-          .Where(u => u.Email == updateUserDto.Email && u.Id != id)
-          .FirstOrDefaultAsync();
+                var updatedUser = await _userRepo.UpdateUserByIdAsync(id, updateUserDto);
 
-                if (existingUserWithEmail != null)
+                if (updatedUser == null)
                 {
-                    return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
+                    _logger.LogInformation("Not Found User With this Id {UserId}", id);
+                    return NotFound(new NotFoundResponse { Message = $"User with Id {id} not found." });
                 }
-                //definition in utils
-                UserUpdateHelper.ApplyUpdates(user, updateUserDto);
-                await _context.SaveChangesAsync();
-
-                var userDto = user.ToUserDto();
-               var response = (new UpdateUserResponse
+                _logger.LogInformation("Successfuly Updated User With Id {UserId}", id);
+                return Ok(new
                 {
-                    Message = "User successfully updated.",
-                    User = userDto
+                    Message = "User updated successfully.",
+                    User = updatedUser
                 });
-              return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while updating user with Id {UserId}.", id);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -198,33 +192,31 @@ namespace WebApplication1.Controllers
 
         //DeleteUserById
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUserById(int id)
         {
             try
             {
-                var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync( u => u.Id == id);
-                if (user == null)
+                var deletedUser = await _userRepo.DeleteUserByIdAsync(id);
+
+                if (deletedUser == null)
                 {
-                    return NotFound(new NotFoundResponse { Message = "User Not found." });
+                    _logger.LogInformation("Not Found User With this Id {UserId}", id);
+                    return NotFound(new NotFoundResponse { Message = $"User with Id {id} not found." });
                 }
-
-                _context.Users.Remove(user);
-                await _context.SaveChangesAsync();
-
-                var response = new DeleteUserResponse
+                _logger.LogInformation("Successfuly Deleted User With Id {UserId}", id);
+                return Ok(new DeleteUserResponse
                 {
-                    Message = "User and their messages successfully deleted."
-                };
-
-                return Ok(response);
+                    Message = "User deleted successfully.",
+                    User = deletedUser
+                });
             }
             catch (Exception ex)
             {
-               
+                _logger.LogError(ex, "An error occurred while deleting user with Id {UserId}.", id);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
-                    message = "Internal Server Error",
-                    details = ex.Message
+                    Message = "Internal Server Error",
+                    Details = ex.Message
                 });
             }
         }

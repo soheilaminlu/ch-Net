@@ -14,6 +14,7 @@
           "Microsoft.EntityFrameworkCore.Design": "6.0.9",
           "Microsoft.EntityFrameworkCore.Sqlite": "6.0.9",
           "Microsoft.EntityFrameworkCore.Tools": "6.0.9",
+          "Microsoft.Extensions.Logging": "6.0.0",
           "Swashbuckle.AspNetCore": "6.5.0"
         },
         "runtime": {

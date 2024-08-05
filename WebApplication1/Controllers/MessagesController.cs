@@ -9,6 +9,8 @@ using WebApplication1.TestHelpers;
 using Microsoft.AspNetCore.Cors;
 using WebApplication1.ErrorHandling;
 using WebApplication1.Mapper;
+using WebApplication1.Interfaces;
+using WebApplication1.Repository;
 
 namespace WebApplication1.Controllers
 {
@@ -19,10 +21,14 @@ namespace WebApplication1.Controllers
     {
         // DbConfiguration
         private readonly ApplicationDbContext _context;
+        private readonly IMessageRepository _messageRepo;
+        private readonly ILogger<MessagesController> _logger;
 
-        public MessagesController(ApplicationDbContext context)
+        public MessagesController(ApplicationDbContext context , ILogger<MessagesController> logger , IMessageRepository messageRepo)
         {
             _context = context;
+            _logger = logger;
+            _messageRepo = messageRepo;
         }
 
         [HttpGet]
@@ -30,25 +36,26 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var messages = await _context.Messages.ToListAsync();
+                // Call the repository method to get all messages
+                var messagesDto = await _messageRepo.GetAllMessagesAsync();
 
-                if (messages == null || !messages.Any())
+                if (messagesDto == null || !messagesDto.Any())
                 {
-                    return NotFound(new NotFoundResponse { Message = "No messages found" });
+                    _logger.LogInformation("Not Found Any Message");
+                    return NotFound(new NotFoundResponse { Message = "No messages found." });
                 }
-
-                var messagesDto = messages.ToMessagesDtos(); 
 
                 var response = new GetAllMessagesResponse
                 {
-                    Message = "Messages Retrieved Successfuly",
-                    MessagesInfo = messagesDto.ToList()
+                    Message = "Messages Retrieved Successfully",
+                    MessagesInfo = messagesDto
                 };
-
+                _logger.LogInformation(" Retrived {Count} Message Successfuly", messagesDto.Count);
                 return Ok(response);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving messages.");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -62,25 +69,25 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var message = await _context.Messages.FirstOrDefaultAsync(x => x.Id == id);
+                var messageDto = await _messageRepo.GetMessageByIdAsync(id);
 
-                if (message == null)
+                if (messageDto == null)
                 {
-                    return NotFound(new NotFoundResponse { Message = "Message Not found" });
+                    _logger.LogInformation("Message with Id {MessageId} not found.", id);
+                    return NotFound(new NotFoundResponse { Message = $"Message with Id {id} not found." });
                 }
 
-                
-                var messageDto = message.ToMessagesDto();
+                _logger.LogInformation("Retrived Message Successfuly with Id {MessageId}", id);
 
                 return Ok(new
                 {
-                    message = "Message Retrived successfully",
-                    MessageData = messageDto,
-                   
+                    Message = "Message retrieved successfully.",
+                    MessageInfo = messageDto
                 });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving message with Id {MessageId}.", id);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -94,18 +101,17 @@ namespace WebApplication1.Controllers
         {
             try
             {
-                var message = await _context.Messages.FindAsync(id);
-                if (message == null)
+                var deleteMessage = await _messageRepo.DeleteMessageAsync(id);
+                if (deleteMessage == null)
                 {
+                    _logger.LogInformation("Not Found Reponse For Message with Id {MessageId}" , id);
                     return NotFound(new NotFoundResponse { Message = "Message Not found" });
                 }
 
-                _context.Messages.Remove(message);
-                await _context.SaveChangesAsync(); // Ensure async save
-
                 var response = new DeleteMessageResponse
                 {
-                    Message = "Message Deleted Successfully"
+                    Message = "Message Deleted Successfully",
+                    MessageModel = deleteMessage
                 };
                 return Ok(response);
 
@@ -129,32 +135,25 @@ namespace WebApplication1.Controllers
                 return BadRequest(new BadRequestResponse { Message = "Invalid message data" });
             }
 
-            var message = new MessageModel
-            {
-                Content = createMessageDto.Content,
-                UserId = createMessageDto.UserId,
-                DateCreated = DateTime.UtcNow,
-                DateModified = DateTime.UtcNow,
-            };
-
             try
             {
-                _context.Messages.Add(message);
-                await _context.SaveChangesAsync();
+                var messageDto = await _messageRepo.CreateMessageAsync(createMessageDto);
 
-                var messageDto = message.ToMessagesDto();
+                if (messageDto == null)
+                {
+                    _logger.LogInformation("Failed to CreateMessage");
+                    return BadRequest(new BadRequestResponse { Message = "Failed to Create Message" });
+                }
 
-                var response = new CreateMessageResponse
+                return CreatedAtAction(nameof(GetMessageById), new { id = messageDto.Id }, new CreateMessageResponse
                 {
                     Message = "Message successfully created.",
                     MessageInfo = messageDto
-                    
-                };
-
-                return CreatedAtAction(nameof(GetAllMessages), new { id = message.Id }, response);
+                });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while creating a message.");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -167,28 +166,30 @@ namespace WebApplication1.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateMessage(int id, [FromBody] UpdateMessageDto updateMessageDto)
         {
+            if (updateMessageDto == null)
+            {
+                return BadRequest(new BadRequestResponse { Message = "Invalid message data" });
+            }
+
             try
             {
-                var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == id);
-                if (message == null)
-                {
-                    return NotFound(new NotFoundResponse { Message = " Message Not found" });
-                }
-                //definition in utils
-                MessageUpdateHelper.ApplyMessagesUpdate(message, updateMessageDto);
-                message.DateModified = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-               var messageDto =  message.ToMessagesDto();
+                var updatedMessageDto = await _messageRepo.UpdateMessageAsync(id, updateMessageDto);
 
-                var response = new UpdateMessageResponse
+                if (updatedMessageDto == null)
                 {
-                    Message = "Message Updated Successfuly",
-                    UpdatedMessage = messageDto
-                };
-               return Ok(response);
+                    _logger.LogInformation("Message with Id {MessageId} not found for update.", id);
+                    return NotFound(new NotFoundResponse { Message = $"Message with Id {id} not found." });
+                }
+
+                return Ok(new
+                {
+                    Message = "Message updated successfully.",
+                    MessageInfo = updatedMessageDto
+                });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while updating the message with Id {MessageId}.", id);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -197,31 +198,22 @@ namespace WebApplication1.Controllers
             }
         }
         // Get UserMessages With UserId
-       
-        [HttpGet("usermessages/{id}")]
-        public async Task<IActionResult> GetUserMessages(int id)
+
+        [HttpGet("usermessages/{userId}")]
+        public async Task<IActionResult> GetUserMessagesById(int userId)
         {
             try
             {
-                // شامل کردن پیام‌های کاربر در بازیابی داده
-                var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
+                var userMessagesDto = await _messageRepo.GetUserMessagesByIdAsync(userId);
 
-                if (user == null)
+                if (userMessagesDto == null || !userMessagesDto.Any())
                 {
-                    return NotFound(new NotFoundResponse { Message = "User Not found" });
-                }
-
-                // استفاده از MessageMapper برای تبدیل لیست پیام‌ها به DTO
-                var userMessagesDto = user.Messages.ToMessagesDtos().ToList();
-
-                if (userMessagesDto.Count == 0)
-                {
-                    return NotFound(new NotFoundResponse { Message = "Not Found Any Messages For this User" });
+                    return NotFound(new NotFoundResponse { Message = $"No messages found for user with Id {userId}." });
                 }
 
                 var response = new GetUserMessagesResponse
                 {
-                    Message = $"Retrived Messages from User {id}",
+                    Message = $"Messages for user with Id {userId} retrieved successfully.",
                     UserMessages = userMessagesDto
                 };
 
@@ -229,6 +221,7 @@ namespace WebApplication1.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while retrieving messages for user with Id {UserId}.", userId);
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",

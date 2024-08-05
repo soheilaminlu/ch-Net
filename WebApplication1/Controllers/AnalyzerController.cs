@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using static WebApplication1.Utils.ReverseNumber;
-using static WebApplication1.Utils.RemoveDuplicate;
 using WebApplication1.TestHelpers;
 using Microsoft.AspNetCore.Cors;
+using WebApplication1.Interfaces;
+using WebApplication1.ErrorHandling;
 
 namespace WebApplication1.Controllers
 {
@@ -11,42 +11,68 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class AnalyzerController : ControllerBase
     {
-        [HttpPost("reversenum")]
-        public IActionResult ReverseNumber([FromBody] int number)
+        private readonly ILogger<AnalyzerController> _logger;
+        private readonly IAnalyzerRepository _analyzerRepo;
+        public AnalyzerController(ILogger<AnalyzerController> logger, IAnalyzerRepository analyzerRepo)
         {
-            if (number < 0)
+            _logger = logger;
+            _analyzerRepo = analyzerRepo;
+        }
+
+        [HttpPost("reversenum")]
+        public IActionResult ReverseNumber([FromBody] uint number)
+        {
+            try
             {
-                return BadRequest(new { message = "Number must be non-negative." });
+                var reversedNumber = _analyzerRepo.ReverseInteger(number);
+
+                if (reversedNumber == 0)
+                {
+                    return BadRequest(new { message = "Zero is not a valid reversed number" });
+                }
+
+                var response = new ReverseNumberResponse
+                {
+                    ReversedNumber = reversedNumber
+                };
+
+                return Ok(response);
             }
-
-            // Definition in Utils
-            uint reversedNumber = ReverseInteger((uint)number);
-
-
-            var response = new ReverseNumberResponse
+            catch (Exception ex)
             {
-                ReversedNumber = reversedNumber
-            };
-            return Ok(response);
+                _logger.LogError(ex, "Error reversing number");
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
         }
 
         [HttpPost("removeduplicate")]
         public IActionResult RemoveDuplicate([FromBody] string input)
         {
-            if (string.IsNullOrEmpty(input))
+            try
             {
-                return BadRequest(new { message = "Input cannot be null or empty." });
+                if (string.IsNullOrEmpty(input))
+                {
+                    return BadRequest(new { message = "Input cannot be null or empty." });
+                }
 
+                var result = _analyzerRepo.RemoveDuplicates(input);
+
+                var response = new RemoveDuplicateResponse
+                {
+                    Message = result
+                };
+
+                return Ok(response);
             }
-            // Deifinition in Utils
-            string result = RemoveDup(input);
-            var response = new RemoveDuplicateResponse
+            catch (Exception ex)
             {
-                Message = result
-            };
-            return Ok(response);
+                _logger.LogError(ex, "Error removing duplicates");
+                return StatusCode(500, new { message = "Internal Server Error" });
+            }
+
 
         }
     }
 }
+
    

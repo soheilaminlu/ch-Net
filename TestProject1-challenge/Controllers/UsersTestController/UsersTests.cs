@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Castle.Core.Logging;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +11,9 @@ using WebApplication1.Controllers;
 using WebApplication1.Data;
 using WebApplication1.Dto;
 using WebApplication1.ErrorHandling;
+using WebApplication1.Interfaces;
 using WebApplication1.Models;
+using WebApplication1.Repository;
 using WebApplication1.TestHelpers;
 
 namespace TestProject1_challenge.Controllers.UsersTestController
@@ -19,11 +23,15 @@ namespace TestProject1_challenge.Controllers.UsersTestController
     {
         private readonly ApplicationDbContext _context;
         private readonly UsersController _controller;
+        private readonly IUserRepository _userRepository;
+        private readonly ILogger<UsersController> _logger;
 
         public UsersTests()
         {
             _context = GetDbContext();
-            _controller = GetController(_context);
+            _userRepository = GetUserRepository(_context);
+            _logger = GetLogger<UsersController>();
+            _controller = GetController(_context , _userRepository, _logger);
         }
 
         private ApplicationDbContext GetDbContext()
@@ -39,9 +47,20 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             return context;
         }
 
-        private UsersController GetController(ApplicationDbContext context)
+        private IUserRepository GetUserRepository(ApplicationDbContext context)
         {
-            return new UsersController(context);
+            var logger = GetLogger<UserRepository>();
+            return new UserRepository(context, logger);
+        }
+
+        private UsersController GetController(ApplicationDbContext context, IUserRepository userRepo, ILogger<UsersController> logger)
+        {
+            return new UsersController(context, logger, userRepo);
+        }
+
+        private ILogger<T> GetLogger<T>()
+        {
+            return new LoggerFactory().CreateLogger<T>();
         }
 
         public void Dispose()
@@ -71,7 +90,6 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             // Assert user list
             var users = response.Users;
 
-
             var firstUser = users.First();
             Assert.Equal(1, firstUser.Id);
             Assert.Equal("John", firstUser.FirstName);
@@ -93,7 +111,9 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         {
             // Arrange
             var context = GetDbContext();
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
 
             // Ensure the database is empty
             context.Users.RemoveRange(context.Users);
@@ -139,7 +159,9 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         {
             // Arrange
             var context = GetDbContext();
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
 
             // Create an invalid DTO (e.g., missing required fields)
             var invalidDto = new CreateUserDto
@@ -180,7 +202,9 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             context.Users.Add(existingUser);
             await context.SaveChangesAsync();
 
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
             var newUserDto = new CreateUserDto
             {
                 FirstName = "Jane",
@@ -237,7 +261,9 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         {
             // Arrange
             var context = GetDbContext();
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
 
             // Act
             var result = await controller.GetUserById(999); // Assuming ID 999 does not exist
@@ -274,7 +300,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
                 Age = 30,
                 Website = "www.updatedalicesmith.com"
             };
-            var result = await _controller.UpdateUser(1, updateUserDto);
+            var result = await _controller.UpdateUserById(1, updateUserDto);
 
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<UpdateUserResponse>(okResult.Value);
@@ -310,14 +336,16 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             context.Users.Add(userToUpdate);
             await context.SaveChangesAsync();
 
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
             var updateUserDto = new UpdateUserDto
             {
                 Email = "existing@example.com" // Attempt to update with an email that already exists
             };
 
             // Act
-            var result = await controller.UpdateUser(2, updateUserDto); // Update user with ID 2
+            var result = await controller.UpdateUserById(2, updateUserDto); // Update user with ID 2
 
             // Assert
             var conflictResult = Assert.IsType<ConflictObjectResult>(result);
@@ -330,14 +358,16 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         {
             // Arrange
             var context = GetDbContext();
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
             var updateUserDto = new UpdateUserDto
             {
                 Email = "new@example.com"
             };
 
             // Act
-            var result = await controller.UpdateUser(1, updateUserDto); // Assuming user id 1 does not exist
+            var result = await controller.UpdateUserById(1, updateUserDto); // Assuming user id 1 does not exist
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
@@ -362,7 +392,7 @@ namespace TestProject1_challenge.Controllers.UsersTestController
             _context.Messages.Add(new MessageModel { Content = "Hello Alice", UserId = 1 });
             await _context.SaveChangesAsync();
 
-            var result = await _controller.DeleteUser(1);
+            var result = await _controller.DeleteUserById(1);
             var okResult = Assert.IsType<OkObjectResult>(result);
             var response = Assert.IsType<DeleteUserResponse>(okResult.Value);
 
@@ -380,10 +410,12 @@ namespace TestProject1_challenge.Controllers.UsersTestController
         public async Task DeleteUser_ShouldReturnNotFound_WhenUserDoesNotExist()
         {
             var context = GetDbContext();
-            var controller = GetController(context);
+            var userRepository = GetUserRepository(context);
+            var logger = GetLogger<UsersController>();
+            var controller = GetController(context, userRepository, logger);
 
             // Act
-            var result = await controller.DeleteUser(999); // Id that does not exist
+            var result = await controller.DeleteUserById(999); // Id that does not exist
 
             // Assert
             var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
