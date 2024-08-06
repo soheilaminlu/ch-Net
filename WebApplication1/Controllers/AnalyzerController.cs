@@ -28,6 +28,7 @@ namespace WebApplication1.Controllers
 
                 if (reversedNumber == 0)
                 {
+                    _logger.LogWarning("Zero Is Not Valid Number");
                     return BadRequest(new { message = "Zero is not a valid reversed number" });
                 }
 
@@ -35,7 +36,7 @@ namespace WebApplication1.Controllers
                 {
                     ReversedNumber = reversedNumber
                 };
-
+                _logger.LogInformation("Number Reversed Successfuly");
                 return Ok(response);
             }
             catch (Exception ex)
@@ -52,6 +53,7 @@ namespace WebApplication1.Controllers
             {
                 if (string.IsNullOrEmpty(input))
                 {
+                    _logger.LogWarning("Input cannot be Empty or null");
                     return BadRequest(new { message = "Input cannot be null or empty." });
                 }
 
@@ -61,7 +63,7 @@ namespace WebApplication1.Controllers
                 {
                     Message = result
                 };
-
+                _logger.LogInformation("Duplicates are Removed Succussfuly From String");
                 return Ok(response);
             }
             catch (Exception ex)

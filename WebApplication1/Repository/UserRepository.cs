@@ -11,11 +11,12 @@ namespace WebApplication1.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<UserRepository> _logger;
-
-        public UserRepository(ApplicationDbContext context, ILogger<UserRepository> logger)
+ 
+        public UserRepository(ApplicationDbContext context  , ILogger<UserRepository> logger)
         {
             _context = context;
             _logger = logger;
+           
         }
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
@@ -33,7 +34,6 @@ namespace WebApplication1.Repository
 
                 if (user == null)
                 {
-                _logger.LogWarning("User with Id {UserId} not found.", id);
                 return null;
                 }
 
@@ -87,7 +87,7 @@ namespace WebApplication1.Repository
         public async Task<UserModel?> DeleteUserByIdAsync(int id)
         {
           
-                var user = await _context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                var user = await _context.Users.Include(u => u.Messages).FirstOrDefaultAsync(u => u.Id == id);
                 if (user == null)
                 {
                     return null;

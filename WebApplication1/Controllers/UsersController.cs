@@ -77,7 +77,7 @@ namespace WebApplication1.Controllers
 
                 if (user == null)
                 {
-                    _logger.LogInformation("User with Id {UserId} not found.", id);
+                    _logger.LogWarning("User with Id {UserId} not found.", id);
                     return NotFound(new NotFoundResponse { Message = "User Not found" });
                 }
 
@@ -159,7 +159,7 @@ namespace WebApplication1.Controllers
             if (!ModelState.IsValid)
             {
 
-                _logger.LogInformation("Data Validation Error for Creating User");
+                _logger.LogWarning("Data Validation Error for Creating User");
                 return BadRequest(new BadRequestResponse { Message = $"Invalid Data: {ModelState}" });
             }
 
@@ -170,14 +170,14 @@ namespace WebApplication1.Controllers
 
                 if (updatedUser == null)
                 {
-                    _logger.LogInformation("Not Found User With this Id {UserId}", id);
+                    _logger.LogWarning("Not Found User With this Id {UserId}", id);
                     return NotFound(new NotFoundResponse { Message = "User not found." });
                 }
 
 
                 if (await _userRepo.GetUserByEmailAsync(updatedUser.Email))
                 {
-                    _logger.LogWarning("Attempt to create a user with an existing email: {UserEmail}.", updatedUser.Email);
+                    _logger.LogWarning("Attempt to Update a user with an existing email: {UserEmail}.", updatedUser.Email);
                     return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
                 }
 
@@ -210,7 +210,7 @@ namespace WebApplication1.Controllers
 
                 if (deletedUser == null)
                 {
-                    _logger.LogInformation("Not Found User With this Id {UserId}", id);
+                    _logger.LogWarning("Not Found User With this Id {UserId}", id);
                     return NotFound(new NotFoundResponse { Message = $"User with Id {id} not found." });
                 }
                 _logger.LogInformation("Successfuly Deleted User With Id {UserId}", id);

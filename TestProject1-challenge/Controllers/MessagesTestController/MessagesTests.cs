@@ -174,7 +174,7 @@ namespace TestProject1_challenge.Controllers.MessagesTestController
             var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
             var response = Assert.IsType<BadRequestResponse>(badRequestResult.Value);
 
-            Assert.Equal("Invalid message data", response.Message);
+            Assert.Equal("Failed to Create Message", response.Message);
         }
 
         //OK Senario for Update Message

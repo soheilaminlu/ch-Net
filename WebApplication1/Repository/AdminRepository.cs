@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using System.Collections.Concurrent;
 using System.Text.Json;
 using WebApplication1.Interfaces;
 using WebApplication1.Services;
@@ -7,9 +8,11 @@ namespace WebApplication1.Repository
 {
     public class AdminRepository : IAdminRepository
     {
-        private static readonly Queue<JsonElement> _messageQueue = new Queue<JsonElement>();
+        private static readonly ConcurrentQueue<JsonElement> _messageQueue = new ConcurrentQueue<JsonElement>();
+
         public Task ClearQueueAsync()
         {
+            
             _messageQueue.Clear();
             return Task.CompletedTask;
         }
@@ -21,16 +24,17 @@ namespace WebApplication1.Repository
 
         public async Task ProcessQueueAsync(IHubContext<MessageHub> hubContext)
         {
-
+            
             if (_messageQueue.Count >= 10)
             {
                 var allMessages = _messageQueue.ToArray();
 
+                _messageQueue.Clear();
+
+               
                 await hubContext.Clients.All.SendAsync("QueueStatusUpdate", "Queue reached 10 items and will clear after 10 seconds");
                 await hubContext.Clients.All.SendAsync("Send All Messages To Clients", JsonSerializer.Serialize(allMessages));
-
-                await Task.Delay(10000);
-                _messageQueue.Clear();
+                await Task.Delay(10000); 
             }
         }
     }

@@ -4,7 +4,6 @@ using WebApplication1.Data;
 using WebApplication1.Dto;
 using WebApplication1.Models;
 using System.Net;
-using static WebApplication1.Utils.ApplyMessageUpdates;
 using WebApplication1.TestHelpers;
 using Microsoft.AspNetCore.Cors;
 using WebApplication1.ErrorHandling;
@@ -104,7 +103,7 @@ namespace WebApplication1.Controllers
                 var deleteMessage = await _messageRepo.DeleteMessageAsync(id);
                 if (deleteMessage == null)
                 {
-                    _logger.LogInformation("Not Found Reponse For Message with Id {MessageId}" , id);
+                    _logger.LogWarning("Not Found Reponse For Message with Id {MessageId}" , id);
                     return NotFound(new NotFoundResponse { Message = "Message Not found" });
                 }
 
@@ -113,10 +112,12 @@ namespace WebApplication1.Controllers
                     Message = "Message Deleted Successfully",
                     MessageModel = deleteMessage
                 };
+                _logger.LogInformation("Message Deleted Successfuly with Id {id}", id);
                 return Ok(response);
 
             } catch (Exception ex)
             {
+                _logger.LogError(ex, "An Error Occured while Deleting Message");
                 return StatusCode((int)HttpStatusCode.InternalServerError, new
                 {
                     Message = "Internal Server Error",
@@ -130,9 +131,10 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateMessage([FromBody] CreateMessageDto createMessageDto)
         {
-            if (createMessageDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new BadRequestResponse { Message = "Invalid message data" });
+                _logger.LogWarning("Data Validation Error");
+                return BadRequest(new BadRequestResponse { Message = $"Invalid message data {ModelState}" });
             }
 
             try
@@ -141,10 +143,11 @@ namespace WebApplication1.Controllers
 
                 if (messageDto == null)
                 {
-                    _logger.LogInformation("Failed to CreateMessage");
+                    _logger.LogWarning("Failed to CreateMessage");
                     return BadRequest(new BadRequestResponse { Message = "Failed to Create Message" });
                 }
 
+                _logger.LogInformation("Successfuly Created Message with Content : {createmessage}" , messageDto.Content);
                 return CreatedAtAction(nameof(GetMessageById), new { id = messageDto.Id }, new CreateMessageResponse
                 {
                     Message = "Message successfully created.",
@@ -166,9 +169,10 @@ namespace WebApplication1.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateMessage(int id, [FromBody] UpdateMessageDto updateMessageDto)
         {
-            if (updateMessageDto == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new BadRequestResponse { Message = "Invalid message data" });
+                _logger.LogWarning("Data Validation Error");
+                return BadRequest(new BadRequestResponse { Message = $"Invalid message data {ModelState}" });
             }
 
             try
@@ -180,6 +184,7 @@ namespace WebApplication1.Controllers
                     _logger.LogInformation("Message with Id {MessageId} not found for update.", id);
                     return NotFound(new NotFoundResponse { Message = $"Message with Id {id} not found." });
                 }
+                _logger.LogInformation("Successfuly Updated Message with Content {updatemessage}", updatedMessageDto.Content);
 
                 return Ok(new UpdateMessageResponse
                 {
@@ -208,6 +213,7 @@ namespace WebApplication1.Controllers
 
                 if (userMessagesDto == null || !userMessagesDto.Any())
                 {
+                    _logger.LogWarning("Not Found Any Message For This User");
                     return NotFound(new NotFoundResponse { Message = "No messages found for user" });
                 }
 
@@ -216,7 +222,7 @@ namespace WebApplication1.Controllers
                     Message = $"Messages for user with Id {userId} retrieved successfully.",
                     UserMessages = userMessagesDto
                 };
-
+                _logger.LogInformation("Messages Retrived Successfuly for user with Id {userId}", userId);
                 return Ok(response);
             }
             catch (Exception ex)
