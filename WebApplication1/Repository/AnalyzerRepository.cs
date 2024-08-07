@@ -39,29 +39,3 @@ namespace WebApplication1.Repository
         }
     }
 }
- // IF WE WANT MAXIMUM ONE TIME DUPLICATE
-
-//public string LimitCharacterRepetitions(string input)
-//{
-//    var characterCount = new Dictionary<char, int>();
-//    var result = new StringBuilder();
-
-//    foreach (var character in input)
-//    {
-//        if (characterCount.ContainsKey(character))
-//        {
-//            if (characterCount[character] < 2)
-//            {
-//                result.Append(character);
-//                characterCount[character]++;
-//            }
-//        }
-//        else
-//        {
-//            result.Append(character);
-//            characterCount[character] = 1;
-//        }
-//    }
-
-//    return result.ToString();
-//}

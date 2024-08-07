@@ -1,34 +1,46 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\",
+  "WorkspaceRootPath": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\webapplication1\\repository\\analyzerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\repository\\analyzerrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\testproject1-challenge\\controllers\\userstestcontroller\\userstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|solutionrelative:testproject1-challenge\\controllers\\userstestcontroller\\userstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\webapplication1\\controllers\\messagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\messagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\testproject1-challenge\\controllers\\messagestestcontroller\\messagestests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|solutionrelative:testproject1-challenge\\controllers\\messagestestcontroller\\messagestests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\webapplication1\\repository\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\repository\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\repository\\userrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\webapplication1\\controllers\\adminmessagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\interfaces\\iuserrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\controllers\\adminmessagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\adminmessagecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\challenge-test-master\\challenge-test-master\\webapplication1\\repository\\adminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\controllers\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\repository\\adminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\repository\\adminrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\data\\applicationdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\dto\\updateuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\dto\\updateuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\webapplication1\\responses\\deleteuserresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7B0D07F3-AE53-4E08-9CC9-5F41863D24E0}|WebApplication1\\WebApplication1.csproj|solutionrelative:webapplication1\\responses\\deleteuserresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|c:\\users\\user\\desktop\\refactor-challenge\\challenge-test-master\\testproject1-challenge\\controllers\\userstestcontroller\\userstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BA0E318C-D33C-4527-B260-D96A5DD35641}|TestProject1-challenge\\TestProject1-challenge.csproj|solutionrelative:testproject1-challenge\\controllers\\userstestcontroller\\userstests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,93 +50,134 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "AnalyzerRepository.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\AnalyzerRepository.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Repository\\AnalyzerRepository.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\AnalyzerRepository.cs",
-              "RelativeToolTip": "WebApplication1\\Repository\\AnalyzerRepository.cs",
-              "ViewState": "AQIAACIAAAAAAAAAAAAwwCoAAAAAAAAA",
+              "DocumentIndex": 5,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Program.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Program.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Program.cs",
+              "RelativeToolTip": "WebApplication1\\Program.cs",
+              "ViewState": "AQIAAAwAAAAAAAAAAAAAAC4AAAAVAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T11:53:11.743Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "MessagesTests.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\TestProject1-challenge\\Controllers\\MessagesTestController\\MessagesTests.cs",
-              "RelativeDocumentMoniker": "TestProject1-challenge\\Controllers\\MessagesTestController\\MessagesTests.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\TestProject1-challenge\\Controllers\\MessagesTestController\\MessagesTests.cs",
-              "RelativeToolTip": "TestProject1-challenge\\Controllers\\MessagesTestController\\MessagesTests.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAKAAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T11:50:27.558Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "MessagesController.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Controllers\\MessagesController.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\MessagesController.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Controllers\\MessagesController.cs",
-              "RelativeToolTip": "WebApplication1\\Controllers\\MessagesController.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAUAAAARAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T11:49:35.294Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "UserRepository.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\UserRepository.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Repository\\UserRepository.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\UserRepository.cs",
-              "RelativeToolTip": "WebApplication1\\Repository\\UserRepository.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABoAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T11:43:11.266Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "UsersTests.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
-              "RelativeDocumentMoniker": "TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
-              "RelativeToolTip": "TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
-              "ViewState": "AQIAABwAAAAAAAAAAAA2wDgAAAAJAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T10:32:26.731Z",
+              "WhenOpened": "2024-08-07T10:21:12.489Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "AdminRepository.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\AdminRepository.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Repository\\AdminRepository.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Repository\\AdminRepository.cs",
-              "RelativeToolTip": "WebApplication1\\Repository\\AdminRepository.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAACMAAABJAAAA",
+              "Title": "ApplicationDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Data\\ApplicationDbContext.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Data\\ApplicationDbContext.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Data\\ApplicationDbContext.cs",
+              "RelativeToolTip": "WebApplication1\\Data\\ApplicationDbContext.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABEAAAAuAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T10:08:04.043Z"
+              "WhenOpened": "2024-08-07T08:49:59.414Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "AdminMessageController.cs",
-              "DocumentMoniker": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Controllers\\AdminMessageController.cs",
-              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\AdminMessageController.cs",
-              "ToolTip": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\Controllers\\AdminMessageController.cs",
-              "RelativeToolTip": "WebApplication1\\Controllers\\AdminMessageController.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABsAAABUAAAA",
+              "DocumentIndex": 8,
+              "Title": "DeleteUserResponse.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Responses\\DeleteUserResponse.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Responses\\DeleteUserResponse.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Responses\\DeleteUserResponse.cs",
+              "RelativeToolTip": "WebApplication1\\Responses\\DeleteUserResponse.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAcAAAAsAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-08-06T08:42:31.554Z"
+              "WhenOpened": "2024-08-07T08:12:28.58Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "IUserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Interfaces\\IUserRepository.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Interfaces\\IUserRepository.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Interfaces\\IUserRepository.cs",
+              "RelativeToolTip": "WebApplication1\\Interfaces\\IUserRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABQAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-07T07:39:37.815Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Controllers\\UsersController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\UsersController.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Controllers\\UsersController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\UsersController.cs",
+              "ViewState": "AQIAANUAAAAAAAAAAAAmwAYAAAAiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-07T07:41:19.161Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserRepository.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Repository\\UserRepository.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Repository\\UserRepository.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Repository\\UserRepository.cs",
+              "RelativeToolTip": "WebApplication1\\Repository\\UserRepository.cs",
+              "ViewState": "AQIAACAAAAAAAAAAAAAwwCwAAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-06T11:43:11.266Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "UsersTests.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
+              "RelativeDocumentMoniker": "TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
+              "RelativeToolTip": "TestProject1-challenge\\Controllers\\UsersTestController\\UsersTests.cs",
+              "ViewState": "AQIAABwAAAAAAAAAAAA2wDgAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-06T10:32:26.731Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AdminRepository.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Repository\\AdminRepository.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Repository\\AdminRepository.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Repository\\AdminRepository.cs",
+              "RelativeToolTip": "WebApplication1\\Repository\\AdminRepository.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-06T10:08:04.043Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "AdminMessageController.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Controllers\\AdminMessageController.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Controllers\\AdminMessageController.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Controllers\\AdminMessageController.cs",
+              "RelativeToolTip": "WebApplication1\\Controllers\\AdminMessageController.cs",
+              "ViewState": "AQIAABEAAAAAAAAAAAAQwCYAAAAGAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-06T08:42:31.554Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "UpdateUserDto.cs",
+              "DocumentMoniker": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Dto\\UpdateUserDto.cs",
+              "RelativeDocumentMoniker": "WebApplication1\\Dto\\UpdateUserDto.cs",
+              "ToolTip": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\Dto\\UpdateUserDto.cs",
+              "RelativeToolTip": "WebApplication1\\Dto\\UpdateUserDto.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABgAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-07T08:43:05.161Z"
             }
           ]
         }

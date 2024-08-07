@@ -40,12 +40,12 @@ namespace WebApplication1.Repository
                 return user;
            
         }
-        public async Task<bool> GetUserByEmailAsync(string email)
-        {    
-                return await _context.Users.AnyAsync(u => u.Email == email);   
-
+        public async Task<bool> GetUserByEmailAsync(string email, int? excludeUserId = null)
+        {
+            return await _context.Users
+                .Where(u => u.Email == email && (!excludeUserId.HasValue || u.Id != excludeUserId.Value))
+                .AnyAsync();
         }
-
 
         public async Task<UserDto?> CreateUserAsync(CreateUserDto userDto)
         {

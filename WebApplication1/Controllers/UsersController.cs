@@ -174,10 +174,9 @@ namespace WebApplication1.Controllers
                     return NotFound(new NotFoundResponse { Message = "User not found." });
                 }
 
-
-                if (await _userRepo.GetUserByEmailAsync(updatedUser.Email))
+                if (await _userRepo.GetUserByEmailAsync(updateUserDto.Email, id))
                 {
-                    _logger.LogWarning("Attempt to Update a user with an existing email: {UserEmail}.", updatedUser.Email);
+                    _logger.LogWarning("Attempt to update user with an email that already exists: {UserEmail}.", updateUserDto.Email);
                     return Conflict(new ConflictResponse { Message = "A user with this email already exists." });
                 }
 
@@ -213,11 +212,24 @@ namespace WebApplication1.Controllers
                     _logger.LogWarning("Not Found User With this Id {UserId}", id);
                     return NotFound(new NotFoundResponse { Message = $"User with Id {id} not found." });
                 }
+
+                var userMessages = deletedUser.Messages.Select(m => new UserMessageDto
+                {
+                    Content = m.Content
+                }).ToList();
+
+
                 _logger.LogInformation("Successfuly Deleted User With Id {UserId}", id);
+
                 return Ok(new DeleteUserResponse
                 {
                     Message = "User and their messages successfully deleted.",
-                    User = deletedUser
+                   Firstname  = deletedUser.FirstName,
+                   Lastname = deletedUser.LastName,
+                   Age = deletedUser.Age,
+                   Email = deletedUser.Email,
+                   Website = deletedUser.Website,
+                   UserMessages = userMessages
                 });
             }
             catch (Exception ex)

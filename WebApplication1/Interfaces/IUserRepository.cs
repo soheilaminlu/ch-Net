@@ -9,7 +9,7 @@ namespace WebApplication1.Interfaces
         Task<List<UserDto>> GetAllUsersAsync();
         Task<UserModel?> GetUserByIdAsync(int id);
 
-        Task<bool> GetUserByEmailAsync(string email);
+        Task<bool> GetUserByEmailAsync(string email, int? excludeUserId = null);
 
         Task<UserDto?> CreateUserAsync(CreateUserDto userDto);
 

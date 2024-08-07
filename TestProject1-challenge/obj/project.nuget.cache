@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "3oHHHSz1nAY=",
+  "dgSpecHash": "Y2Y+Q8tUHSA=",
   "success": true,
-  "projectFilePath": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\TestProject1-challenge\\TestProject1-challenge.csproj",
+  "projectFilePath": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\TestProject1-challenge\\TestProject1-challenge.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\user\\.nuget\\packages\\castle.core\\5.1.1\\castle.core.5.1.1.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\coverlet.collector\\3.1.2\\coverlet.collector.3.1.2.nupkg.sha512",
@@ -179,5 +179,12 @@
     "C:\\Users\\user\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.31\\microsoft.netcore.app.ref.6.0.31.nupkg.sha512",
     "C:\\Users\\user\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.31\\microsoft.aspnetcore.app.ref.6.0.31.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
+    }
+  ]
 }

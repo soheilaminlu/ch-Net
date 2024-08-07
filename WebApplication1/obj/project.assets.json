@@ -3298,11 +3298,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\WebApplication1.csproj",
+      "projectUniqueName": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\WebApplication1.csproj",
       "projectName": "WebApplication1",
-      "projectPath": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\WebApplication1.csproj",
+      "projectPath": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\WebApplication1.csproj",
       "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Desktop\\challenge-test-master\\challenge-test-master\\WebApplication1\\obj\\",
+      "outputPath": "C:\\Users\\user\\Desktop\\Refactor-challenge\\challenge-test-master\\WebApplication1\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -3414,5 +3414,13 @@
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.302\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1900",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Error occurred while getting package vulnerability data: Unable to load the service index for source https://api.nuget.org/v3/index.json."
+    }
+  ]
 }

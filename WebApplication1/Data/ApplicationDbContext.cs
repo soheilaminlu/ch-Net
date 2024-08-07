@@ -12,7 +12,7 @@ namespace WebApplication1.Data
 
 
         // Create UserTable in Sqlite Db
-        public virtual DbSet<UserModel> Users {get; set;}
+        public  DbSet<UserModel> Users {get; set;}
 
         // Create MessageTable in Sqlite Db
         public DbSet<MessageModel> Messages { get; set;}
